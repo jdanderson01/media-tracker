@@ -18,6 +18,18 @@ class MediaEntry {
   }
 }
 
+const modal = document.getElementById("mediaModal");
+const modalBtn = document.getElementById("mediaBtn");
+const span = document.getElementsByClassName("close")[0];
+
+modalBtn.onclick = function () {
+  modal.style.display = "block";
+};
+
+span.onclick = function () {
+  modal.style.display = "none";
+};
+
 function addMediaToLibrary() {
   // function to add the input from the form to the myLibrary object
   const title = document.getElementById("title").value;
