@@ -1,9 +1,7 @@
-const myLibrary = [];
-const form = document.querySelector("form");
-
 class MediaEntry {
-  constructor(title, type, genre, dateConsumed, rating) {
+  constructor(id, title, type, genre, dateConsumed, rating) {
     // constructor for the media entry object
+    this.id = id;
     this.title = title;
     this.type = type;
     this.genre = genre;
@@ -18,28 +16,38 @@ class MediaEntry {
   }
 }
 
-const modal = document.getElementById("mediaModal");
-const modalBtn = document.getElementById("mediaBtn");
-const span = document.getElementsByClassName("close")[0];
-
-modalBtn.onclick = function () {
-  modal.style.display = "block";
+const myLibrary = [];
+const form = document.querySelector("form");
+const modal = {
+  container: document.getElementById("mediaModal"),
+  button: document.getElementById("mediaBtn"),
+  closeBtn: document.getElementsByClassName("close")[0],
 };
 
-span.onclick = function () {
-  modal.style.display = "none";
+modal.button.onclick = function () {
+  modal.container.style.display = "block";
+};
+
+modal.closeBtn.onclick = function () {
+  modal.container.style.display = "none";
+};
+
+window.onclick = function (event) {
+  if (event.target == modal.container) {
+    modal.container.style.display = "none";
+  }
 };
 
 function addMediaToLibrary() {
-  // function to add the input from the form to the myLibrary object
-  const title = document.getElementById("title").value;
-  const type = document.getElementById("type").value;
-  const genre = document.getElementById("genre").value;
-  const dateConsumed = document.getElementById("dateConsumed").value;
-  const rating = document.getElementById("rating").value;
+  const title = getValue("title");
+  const type = getValue("type");
+  const genre = getValue("genre");
+  const dateConsumed = getValue("dateConsumed");
+  const rating = getValue("rating");
 
-  //new object from the captured form inputs
-  const newEntry = new MediaEntry(title, type, genre, dateConsumed, rating);
+  const id = new Date().getTime();
+
+  const newEntry = new MediaEntry(id, title, type, genre, dateConsumed, rating);
   myLibrary.push(newEntry);
 
   newEntry.displayInfo();
@@ -49,9 +57,11 @@ function addMediaToLibrary() {
   clearForm();
 }
 
-//loop through the myLibrary array and display the contents
+function getValue(id) {
+  return document.getElementById(id).value;
+}
+
 function displayLibraryContents() {
-  // Find or create the container for library entries
   let mediaContainer = document.getElementById("mediaContainer");
 
   if (!mediaContainer) {
@@ -60,42 +70,59 @@ function displayLibraryContents() {
     document.body.appendChild(mediaContainer);
   }
 
-  // Clear existing content in the media container so there are no duplicates
   mediaContainer.innerHTML = "";
 
   myLibrary.forEach((entry) => {
-    const entryContainer = document.createElement("div");
-    const entryTitle = document.createElement("h2");
-    const entryType = document.createElement("p");
-    const entryGenre = document.createElement("p");
-    const entryDateConsumed = document.createElement("p");
-    const entryRating = document.createElement("p");
-
-    entryTitle.textContent = `Title: ${entry.title}`;
-    entryType.textContent = `Type: ${entry.type}`;
-    entryGenre.textContent = `Genre: ${entry.genre}`;
-    entryDateConsumed.textContent = `Date Consumed: ${entry.dateConsumed}`;
-    entryRating.textContent = `Rating: ${entry.rating}`;
-
-    entryContainer.append(
-      entryTitle,
-      entryType,
-      entryGenre,
-      entryDateConsumed,
-      entryRating
-    );
-    entryContainer.classList.add("entry-container");
+    const entryContainer = createEntryContainer(entry);
     mediaContainer.appendChild(entryContainer);
   });
 }
 
+function createEntryContainer(entry) {
+  const entryContainer = document.createElement("div");
+  const entryTitle = createEntryElement("h2", `Title: ${entry.title}`);
+  const entryType = createEntryElement("p", `Type: ${entry.type}`);
+  const entryGenre = createEntryElement("p", `Genre: ${entry.genre}`);
+  const entryDateConsumed = createEntryElement(
+    "p",
+    `Date Consumed: ${entry.dateConsumed}`
+  );
+  const entryRating = createEntryElement("p", `Rating: ${entry.rating}`);
+  const deleteButton = createEntryElement("button", "Delete Entry");
+  deleteButton.addEventListener("click", () => deleteEntry(entry.id));
+
+  entryContainer.append(
+    entryTitle,
+    entryType,
+    entryGenre,
+    entryDateConsumed,
+    entryRating,
+    deleteButton
+  );
+  entryContainer.classList.add("entry-container");
+
+  return entryContainer;
+}
+
+function deleteEntry(id) {
+  const index = myLibrary.findIndex((entry) => entry.id === id);
+
+  if (index !== -1) {
+    myLibrary.splice(index, 1);
+    displayLibraryContents();
+  }
+}
+
+function createEntryElement(tag, text) {
+  const element = document.createElement(tag);
+  element.textContent = text;
+  return element;
+}
+
 function clearForm() {
-  // function to clear the form after submission
-  document.getElementById("title").value = "";
-  document.getElementById("type").value = "";
-  document.getElementById("genre").value = "";
-  document.getElementById("dateConsumed").value = "";
-  document.getElementById("rating").value = "";
+  ["title", "type", "genre", "dateConsumed", "rating"].forEach((id) => {
+    document.getElementById(id).value = "";
+  });
 }
 
 form.addEventListener("submit", (e) => {
