@@ -1,3 +1,5 @@
+"use strict";
+
 class MediaEntry {
   constructor(id, title, type, genre, dateConsumed, rating) {
     // constructor for the media entry object
@@ -16,7 +18,7 @@ class MediaEntry {
   }
 }
 
-const myLibrary = [];
+const myLibrary = loadLibraryFromLocalStorage();
 const form = document.querySelector("form");
 const modal = {
   container: document.getElementById("mediaModal"),
@@ -53,8 +55,18 @@ function addMediaToLibrary() {
   newEntry.displayInfo();
 
   displayLibraryContents();
+  saveLibraryToLocalStorage();
 
   clearForm();
+}
+
+function loadLibraryFromLocalStorage() {
+  const storedLibrary = localStorage.getItem("myLibrary");
+  return storedLibrary ? JSON.parse(storedLibrary) : [];
+}
+
+function saveLibraryToLocalStorage() {
+  localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
 }
 
 function getValue(id) {
@@ -73,12 +85,12 @@ function displayLibraryContents() {
   mediaContainer.innerHTML = "";
 
   myLibrary.forEach((entry) => {
-    const entryContainer = createEntryContainer(entry);
+    const entryContainer = createEntryItem(entry);
     mediaContainer.appendChild(entryContainer);
   });
 }
 
-function createEntryContainer(entry) {
+function createEntryItem(entry) {
   const entryContainer = document.createElement("div");
   const entryTitle = createEntryElement("h2", `Title: ${entry.title}`);
   const entryType = createEntryElement("p", `Type: ${entry.type}`);
@@ -99,7 +111,7 @@ function createEntryContainer(entry) {
     entryRating,
     deleteButton
   );
-  entryContainer.classList.add("entry-container");
+  entryContainer.classList.add("entry-item");
 
   return entryContainer;
 }
@@ -129,3 +141,17 @@ form.addEventListener("submit", (e) => {
   e.preventDefault();
   addMediaToLibrary();
 });
+
+function loadLibraryFromLocalStorage() {
+  const storedLibrary = localStorage.getItem("myLibrary");
+  return storedLibrary ? JSON.parse(storedLibrary) : [];
+}
+
+function saveLibraryToLocalStorage() {
+  localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
+}
+
+// Display library contents when the page loads
+window.onload = function () {
+  displayLibraryContents();
+};
