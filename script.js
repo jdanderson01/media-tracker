@@ -10,12 +10,6 @@ class MediaEntry {
     this.dateConsumed = dateConsumed;
     this.rating = rating;
   }
-
-  displayInfo() {
-    console.log(
-      `${this.title} - ${this.type} consumed on ${this.dateConsumed}, Rating: ${this.rating}`
-    );
-  }
 }
 
 const myLibrary = loadLibraryFromLocalStorage();
@@ -51,8 +45,6 @@ function addMediaToLibrary() {
 
   const newEntry = new MediaEntry(id, title, type, genre, dateConsumed, rating);
   myLibrary.push(newEntry);
-
-  newEntry.displayInfo();
 
   displayLibraryContents();
   saveLibraryToLocalStorage();
